@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+  "description": "IdentityServer3.Contrib.Store.AzureTableStorage Class Library",
+  "authors": [ "Kyle" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "frameworks": {
+    "net451": { },
+    "net452": { }
+  },
+  "dependencies": {
+    "WindowsAzure.Storage": "6.2.2-preview",
+    "IdentityServer3": "2.4.0"
+  }
+}

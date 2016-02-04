@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IdentityServer3.Contrib.Store.AzureTableStorage</name>
+    </assembly>
+    <members>
+        <member name="T:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore">
+            <summary>
+            An Azure Table Storage backed authrozation code store for Identity Server 3
+            </summary>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.#ctor(IdentityServer3.Core.Services.IClientStore,IdentityServer3.Core.Services.IScopeStore,System.String,System.String)">
+            <summary>
+            Creates a new instance of the Azure Table Storage authorization code store
+            </summary>
+            <param name="clientStore">Needed because we don't serialize the whole AuthroizationCode. It is looked up by id from the store.</param>
+            <param name="scopeStore">Needed because we don't serialize the whole AuthorizationCode. It is looked up by id from the store.</param>
+            <param name="connectionString">The connection string for connecting to Azure Table Storage.</param>
+            <param name="tableName">Optional table name. Defaults to RefreshTokens</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.StoreAsync(System.String,IdentityServer3.Core.Models.AuthorizationCode)">
+            <summary>
+            Saves the authorization code with its given key
+            </summary>
+            <param name="key">The key for the authorization code</param>
+            <param name="value">The authorization code to serialize and store</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.GetAsync(System.String)">
+            <summary>
+            Retrieves the authorization code using its key 
+            </summary>
+            <param name="key">The key for the authorization code</param>
+            <returns>A Tasks with the authorization code</returns>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.RemoveAsync(System.String)">
+            <summary>
+            Removes the authorization code from the store with a given key
+            </summary>
+            <param name="key">The key of the authorization code</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.GetAllAsync(System.String)">
+            <summary>
+            Retrieves all the authorization codes for a given subject
+            </summary>
+            <param name="subject">The subject to filter by.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageAuthorizationCodeStore.RevokeAsync(System.String,System.String)">
+            <summary>
+            Removes the authorization code for a given subject and client.
+            </summary>
+            <param name="subject">The subject to filter by.</param>
+            <param name="client">The client to filter by.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore">
+            <summary>
+            An Azure Table Storage backed refresh token store for Identity Server 3
+            </summary>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.#ctor(IdentityServer3.Core.Services.IClientStore,IdentityServer3.Core.Services.IScopeStore,System.String,System.String)">
+            <summary>
+            Creates a new instance of the Azure Table Storage refresh token store
+            </summary>
+            <param name="clientStore">Needed because we don't serialize the whole AuthroizationCode. It is looked up by id from the store.</param>
+            <param name="scopeStore">Needed because we don't serialize the whole AuthorizationCode. It is looked up by id from the store.</param>
+            <param name="connectionString">The connection string for connecting to Azure Table Storage.</param>
+            <param name="tableName">Optional table name. Defaults to RefreshTokens</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.StoreAsync(System.String,IdentityServer3.Core.Models.RefreshToken)">
+            <summary>
+            Saves the token with its given key
+            </summary>
+            <param name="key">The key for the token</param>
+            <param name="value">The refresh token to serialize and store</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.GetAsync(System.String)">
+            <summary>
+            Retrieves the token using its key 
+            </summary>
+            <param name="key">The key for the token</param>
+            <returns>A Tasks with the token</returns>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.RemoveAsync(System.String)">
+            <summary>
+            Removes the token from the store with a given key
+            </summary>
+            <param name="key">The key of the token</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.GetAllAsync(System.String)">
+            <summary>
+            Retrieves all the tokens for a given subject
+            </summary>
+            <param name="subject">The subject to filter by.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.AzureTableStorageRefreshTokenStore.RevokeAsync(System.String,System.String)">
+            <summary>
+            Removes the token for a given subject and client.
+            </summary>
+            <param name="subject">The subject to filter by.</param>
+            <param name="client">The client to filter by.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1">
+            <summary>
+            A abstract base class for redis stores.
+            </summary>
+            <typeparam name="T">The type of token to store.</typeparam>
+        </member>
+        <member name="F:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1.ClientStore">
+            <summary>
+            The client store to load client information from
+            </summary>
+        </member>
+        <member name="F:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1.ScopeStore">
+            <summary>
+            The scope store to load scope information from
+            </summary>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1.#ctor(IdentityServer3.Core.Services.IClientStore,IdentityServer3.Core.Services.IScopeStore)">
+            <summary>
+            Constructor for setting up base store in derived classes.
+            </summary>
+            <param name="clientStore">The client store to load client information from</param>
+            <param name="scopeStore">The scope store to load scope information from</param>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1.ToJson(`0)">
+            <summary>
+            Serializes an object using the specialized converters
+            </summary>
+            <param name="value">Value to serialize</param>
+            <returns>Serialized JSON for the object</returns>
+        </member>
+        <member name="M:IdentityServer3.Contrib.Store.AzureTableStorage.BaseTokenStore`1.FromJson(System.String)">
+            <summary>
+            Deserializes an object using the specialized converters
+            </summary>
+            <param name="json">The json to deserialize</param>
+            <returns>The deserialized object</returns>
+        </member>
+    </members>
+</doc>
