@@ -1,1 +1,5 @@
-.paket/paket.exe
+.fake*
+build*
+packages*
+artifacts*
+bin*
