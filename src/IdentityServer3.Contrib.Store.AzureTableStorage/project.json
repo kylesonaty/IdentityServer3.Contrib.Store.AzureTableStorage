@@ -1,9 +1,9 @@
 {
-  "version": "1.0.0-*",
+  "version": "0.0.2-*",
   "description": "IdentityServer3.Contrib.Store.AzureTableStorage Class Library",
-  "authors": [ "Kyle" ],
+  "authors": [ "Kyle Sonaty" ],
   "tags": [ "" ],
-  "projectUrl": "",
+  "projectUrl": "https://github.com/kylesonaty/IdentityServer3.Contrib.Store.AzureTableStorage",
   "licenseUrl": "",
 
   "frameworks": {
@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "WindowsAzure.Storage": "6.2.2-preview",
-    "IdentityServer3": "2.4.0"
+    "IdentityServer3": "2.0.1"
   }
 }

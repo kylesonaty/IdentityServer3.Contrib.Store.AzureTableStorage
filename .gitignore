@@ -4,3 +4,4 @@ packages*
 artifacts*
 bin*
 .vs*
+src/IdentityServer3.Contrib.Store.AzureTableStorage/project.lock.json
