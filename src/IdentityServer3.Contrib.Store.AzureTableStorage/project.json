@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-*",
+  "version": "0.0.3-*",
   "description": "IdentityServer3.Contrib.Store.AzureTableStorage Class Library",
   "authors": [ "Kyle Sonaty" ],
   "tags": [ "" ],
