@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace IdentityServer3.Contrib.Store.AzureTableStorage
 {
+    /// <summary>
+    /// An Azure Table Storage backed client store for Identity Server 3
+    /// </summary>
     public class AzureTableStorageClientStore: IClientStore
     {
         private readonly CloudTable _table;
@@ -18,6 +21,11 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             Converters = new List<JsonConverter> {new ClaimConverter()}
         };
 
+        /// <summary>
+        /// Creates a new instance of the Azure Table Storage client store
+        /// </summary>
+        /// <param name="connectionString">Table storage connection string</param>
+        /// <param name="tableName">Optional table name.</param>
         public AzureTableStorageClientStore(string connectionString, string tableName = "Clients")
         {
             var account = CloudStorageAccount.Parse(connectionString);
@@ -26,6 +34,11 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             _table.CreateIfNotExists();
         }
 
+        /// <summary>
+        /// Retrieve a client by client id
+        /// </summary>
+        /// <param name="clientId">The id of the client to retrieve</param>
+        /// <returns></returns>
         public async Task<Client> FindClientByIdAsync(string clientId)
         {
             var op = TableOperation.Retrieve<ClientEntity>(clientId.GetParitionKey(), clientId);

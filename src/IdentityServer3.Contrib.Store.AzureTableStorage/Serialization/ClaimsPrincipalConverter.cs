@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace IdentityServer3.Contrib.Store.AzureTableStorage.Serialization
 {
-    public class ClaimsPrincipalConverter : JsonConverter
+    internal class ClaimsPrincipalConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
