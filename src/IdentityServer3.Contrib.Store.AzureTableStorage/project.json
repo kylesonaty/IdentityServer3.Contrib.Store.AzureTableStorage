@@ -1,10 +1,10 @@
 {
-  "version": "0.0.3-*",
-  "description": "IdentityServer3.Contrib.Store.AzureTableStorage Class Library",
+  "version": "0.0.4-preview",
+  "description": "Azure Table Storage Stores for Identity Server 3",
   "authors": [ "Kyle Sonaty" ],
-  "tags": [ "" ],
+  "tags": [ "IdentityServer3, IdentityServer, AzureTableStorage" ],
   "projectUrl": "https://github.com/kylesonaty/IdentityServer3.Contrib.Store.AzureTableStorage",
-  "licenseUrl": "",
+  "licenseUrl": "https://github.com/kylesonaty/IdentityServer3.Contrib.Store.AzureTableStorage/blob/master/LICENSE",
 
   "frameworks": {
     "net451": { },
