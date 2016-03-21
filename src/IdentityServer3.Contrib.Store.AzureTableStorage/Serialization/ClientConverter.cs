@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace IdentityServer3.Contrib.Store.AzureTableStorage.Serialization
 {
-    internal class ClientConverter : JsonConverter
+    public class ClientConverter : JsonConverter
     {
         private readonly IClientStore _clientStore;
 

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4-*",
+  "version": "0.0.5-*",
   "description": "Azure Table Storage Stores for Identity Server 3",
   "authors": [ "Kyle Sonaty" ],
   "tags": [ "IdentityServer3, IdentityServer, AzureTableStorage" ],
