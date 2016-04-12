@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer3.Core.Models;
@@ -10,7 +11,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
 {
     public class AzureTableStorageConsentStore : IConsentStore
     {
-        private readonly CloudTable _table;
+        private readonly Lazy<CloudTable> _table;
 
         /// <summary>
         /// Creates a new instance of the Azure Table Storage consent store
@@ -19,10 +20,15 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         /// <param name="tableName">Optional table name.</param>
         public AzureTableStorageConsentStore(string connectionString, string tableName = "Consent")
         {
-            var account = CloudStorageAccount.Parse(connectionString);
-            var client = account.CreateCloudTableClient();
-            _table = client.GetTableReference(tableName);
-            _table.CreateIfNotExists();
+            _table = new Lazy<CloudTable>(() =>
+            {
+                var account = CloudStorageAccount.Parse(connectionString);
+                var client = account.CreateCloudTableClient();
+                var table = client.GetTableReference(tableName);
+
+                table.CreateIfNotExists();
+                return table;
+            });
         }
 
         /// <summary>
@@ -38,7 +44,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _table.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken);
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
@@ -60,7 +66,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 ETag = "*"
             };
             var op = TableOperation.Delete(entity);
-            await _table.ExecuteAsync(op);
+            await _table.Value.ExecuteAsync(op);
         }
 
         /// <summary>
@@ -72,7 +78,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         public async Task<Consent> LoadAsync(string subject, string client)
         {
             var op = TableOperation.Retrieve<ConsentEntity>(subject, client);
-            var result = await _table.ExecuteAsync(op);
+            var result = await _table.Value.ExecuteAsync(op);
             var entity = result.Result as ConsentEntity;
             if (entity != null)
             {
@@ -100,7 +106,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 Scopes = string.Join(",",consent.Scopes)
             };
             var op = TableOperation.InsertOrReplace(entity);
-            await _table.ExecuteAsync(op);
+            await _table.Value.ExecuteAsync(op);
         }
     }
 }
