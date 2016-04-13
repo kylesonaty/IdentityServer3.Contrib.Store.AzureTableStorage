@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using IdentityServer3.Contrib.Store.AzureTableStorage.Serialization;
 using IdentityServer3.Core.Models;
@@ -14,7 +15,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
     /// </summary>
     public class AzureTableStorageClientStore: IClientStore
     {
-        private readonly CloudTable _table;
+        private readonly Lazy<CloudTable> _table;
 
         private readonly JsonSerializerSettings _settings = new JsonSerializerSettings
         {
@@ -28,10 +29,15 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         /// <param name="tableName">Optional table name.</param>
         public AzureTableStorageClientStore(string connectionString, string tableName = "Clients")
         {
-            var account = CloudStorageAccount.Parse(connectionString);
-            var client = account.CreateCloudTableClient();
-            _table = client.GetTableReference(tableName);
-            _table.CreateIfNotExists();
+            _table = new Lazy<CloudTable>(() =>
+            {
+                var account = CloudStorageAccount.Parse(connectionString);
+                var client = account.CreateCloudTableClient();
+                var table = client.GetTableReference(tableName);
+
+                table.CreateIfNotExists();
+                return table;
+            });
         }
 
         /// <summary>
@@ -42,7 +48,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         public async Task<Client> FindClientByIdAsync(string clientId)
         {
             var op = TableOperation.Retrieve<ClientEntity>(clientId.GetParitionKey(), clientId);
-            var result = await _table.ExecuteAsync(op);
+            var result = await _table.Value.ExecuteAsync(op);
             var client = result.Result as ClientEntity;
             return client != null ? JsonConvert.DeserializeObject<Client>(client.Json, _settings) : null;
         }

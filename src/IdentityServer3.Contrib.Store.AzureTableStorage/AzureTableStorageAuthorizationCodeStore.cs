@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer3.Core.Models;
@@ -13,7 +14,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
     /// </summary>
     public class AzureTableStorageAuthorizationCodeStore : BaseTokenStore<AuthorizationCode>, IAuthorizationCodeStore
     {
-        private readonly CloudTable _table;
+        private readonly Lazy<CloudTable> _table;
 
         /// <summary>
         /// Creates a new instance of the Azure Table Storage authorization code store
@@ -24,10 +25,15 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         /// <param name="tableName">Optional table name. Defaults to RefreshTokens</param>
         public AzureTableStorageAuthorizationCodeStore(IClientStore clientStore, IScopeStore scopeStore, string connectionString, string tableName = "AuthorizationCodes") : base(clientStore, scopeStore)
         {
-            var account = CloudStorageAccount.Parse(connectionString);
-            var client = account.CreateCloudTableClient();
-            _table = client.GetTableReference(tableName);
-            _table.CreateIfNotExists();
+            _table = new Lazy<CloudTable>(() =>
+            {
+                var account = CloudStorageAccount.Parse(connectionString);
+                var client = account.CreateCloudTableClient();
+                var table = client.GetTableReference(tableName);
+
+                table.CreateIfNotExists();
+                return table;
+            });
         }
 
         /// <summary>
@@ -46,7 +52,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 SubjectId = value.SubjectId
             };
             var op = TableOperation.InsertOrReplace(entity);
-            await _table.ExecuteAsync(op);
+            await _table.Value.ExecuteAsync(op);
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         public async Task<AuthorizationCode> GetAsync(string key)
         {
             var op = TableOperation.Retrieve<TokenTableEntity>(key.GetParitionKey(), key);
-            var result = await _table.ExecuteAsync(op);
+            var result = await _table.Value.ExecuteAsync(op);
             var tokenEntity = result.Result as TokenTableEntity;
             return tokenEntity != null ? FromJson(tokenEntity.Json) : null;
         }
@@ -75,7 +81,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 ETag = "*"
             };
             var op = TableOperation.Delete(entity);
-            await _table.ExecuteAsync(op);
+            await _table.Value.ExecuteAsync(op);
         }
 
         /// <summary>
@@ -92,7 +98,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _table.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken);
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
@@ -116,14 +122,14 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _table.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken);
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
             list.ForEach(async entity =>
             {
                 var op = TableOperation.Delete(entity);
-                await _table.ExecuteAsync(op);
+                await _table.Value.ExecuteAsync(op);
             });
         }
     }
