@@ -126,11 +126,13 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
-            list.ForEach(async entity =>
+            var entityDeletionTasks = list.Select(entity =>
             {
                 var op = TableOperation.Delete(entity);
-                await _table.Value.ExecuteAsync(op);
+                return _table.Value.ExecuteAsync(op);
             });
+
+            await Task.WhenAll(entityDeletionTasks);
         }
     }
 }
