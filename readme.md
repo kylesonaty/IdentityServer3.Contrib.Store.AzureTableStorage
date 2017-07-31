@@ -1,4 +1,4 @@
-#Azure Table Storage Store for Identity Server 3
+# Azure Table Storage Store for Identity Server 3
 
 This project implement different stores for Identity Server 3 using Azure Table Storage as the data store.
 
@@ -11,7 +11,7 @@ Planned
 * Scope Store
 * Consent Store
 
-##How to use
+## How to use
 
 To use download the [nuget package](https://www.nuget.org/packages/IdentityServer3.Contrib.Store.AzureTableStorage/).
 
