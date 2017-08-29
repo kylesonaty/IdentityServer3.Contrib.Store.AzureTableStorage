@@ -1,16 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1D98D1D1-18EA-4D6A-A066-CCAFF7A88AD4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D219E1D-EC79-40C7-A32A-E0D5AAC35326}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IdentityServer3.Contrib.Store.AzureTableStorage", "src\IdentityServer3.Contrib.Store.AzureTableStorage\IdentityServer3.Contrib.Store.AzureTableStorage.xproj", "{E076EC1F-4E84-4456-9539-5221CB754410}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer3.Contrib.Store.AzureTableStorage", "src\IdentityServer3.Contrib.Store.AzureTableStorage\IdentityServer3.Contrib.Store.AzureTableStorage.csproj", "{E076EC1F-4E84-4456-9539-5221CB754410}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E076EC1F-4E84-4456-9539-5221CB754410} = {1D98D1D1-18EA-4D6A-A066-CCAFF7A88AD4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6EBA3BBD-AF62-4C6C-B4C2-0BEEA4F0EFC8}
 	EndGlobalSection
 EndGlobal
