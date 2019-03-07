@@ -11,22 +11,20 @@ using Retry;
 
 namespace IdentityServer3.Contrib.Store.AzureTableStorage
 {
-    /// <summary>
-    /// An Azure Table Storage backed authrozation code store for Identity Server 3
-    /// </summary>
-    public class AzureTableStorageAuthorizationCodeStore : BaseTokenStore<AuthorizationCode>, IAuthorizationCodeStore
+    public class AzureTableStorageTokenHandleStore : BaseTokenStore<Token>, ITokenHandleStore
     {
         private readonly Lazy<CloudTable> _table;
         private readonly RetryHelper _retryHelper;
 
         /// <summary>
-        /// Creates a new instance of the Azure Table Storage authorization code store
+        /// Creates a new instance of the Azure Table Storage token handle store
         /// </summary>
-        /// <param name="clientStore">Needed because we don't serialize the whole AuthroizationCode. It is looked up by id from the store.</param>
-        /// <param name="scopeStore">Needed because we don't serialize the whole AuthorizationCode. It is looked up by id from the store.</param>
+        /// <param name="clientStore">Needed because we don't serialize the whole TokenHandle. It is looked up by id from the store.</param>
+        /// <param name="scopeStore">Needed because we don't serialize the whole TokenHandle. It is looked up by id from the store.</param>
         /// <param name="connectionString">The connection string for connecting to Azure Table Storage.</param>
-        /// <param name="tableName">Optional table name. Defaults to RefreshTokens</param>
-        public AzureTableStorageAuthorizationCodeStore(IClientStore clientStore, IScopeStore scopeStore, string connectionString, string tableName = "AuthorizationCodes") : base(clientStore, scopeStore)
+        /// <param name="tableName">Optional table name. Defaults to TokenHandle</param>
+        public AzureTableStorageTokenHandleStore(IClientStore clientStore, IScopeStore scopeStore, string connectionString, string tableName = "TokenHandle")
+            : base(clientStore, scopeStore)
         {
             _table = new Lazy<CloudTable>(() =>
             {
@@ -47,11 +45,11 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         }
 
         /// <summary>
-        /// Saves the authorization code with its given key
+        /// Saves the token with its given key
         /// </summary>
-        /// <param name="key">The key for the authorization code</param>
-        /// <param name="value">The authorization code to serialize and store</param>
-        public async Task StoreAsync(string key, AuthorizationCode value)
+        /// <param name="key">The key for the token</param>
+        /// <param name="value">The refresh token to serialize and store</param>
+        public async Task StoreAsync(string key, Token value)
         {
             var entity = new TokenTableEntity
             {
@@ -66,11 +64,11 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         }
 
         /// <summary>
-        /// Retrieves the authorization code using its key 
+        /// Retrieves the token using its key 
         /// </summary>
-        /// <param name="key">The key for the authorization code</param>
-        /// <returns>A Tasks with the authorization code</returns>
-        public async Task<AuthorizationCode> GetAsync(string key)
+        /// <param name="key">The key for the token</param>
+        /// <returns>A Tasks with the token</returns>
+        public async Task<Token> GetAsync(string key)
         {
             var op = TableOperation.Retrieve<TokenTableEntity>(key.GetParitionKey(), key);
             var result = await _retryHelper.Try(() => _table.Value.ExecuteAsync(op)).UntilNoException();
@@ -79,9 +77,9 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         }
 
         /// <summary>
-        /// Removes the authorization code from the store with a given key
+        /// Removes the token from the store with a given key
         /// </summary>
-        /// <param name="key">The key of the authorization code</param>
+        /// <param name="key">The key of the token</param>
         public async Task RemoveAsync(string key)
         {
             var entity = new TokenTableEntity
@@ -95,20 +93,18 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         }
 
         /// <summary>
-        /// Retrieves all the authorization codes for a given subject
+        /// Retrieves all the tokens for a given subject
         /// </summary>
         /// <param name="subject">The subject to filter by.</param>
         /// <returns></returns>
         public async Task<IEnumerable<ITokenMetadata>> GetAllAsync(string subject)
         {
-            var query =
-                new TableQuery<TokenTableEntity>().Where(TableQuery.GenerateFilterCondition("SubjectId",
-                    QueryComparisons.Equal, subject));
+            var query = new TableQuery<TokenTableEntity>().Where(TableQuery.GenerateFilterCondition("SubjectId", QueryComparisons.Equal, subject));
             var list = new List<TokenTableEntity>();
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _retryHelper.Try(() =>_table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
+                var result = await _retryHelper.Try(() => _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
@@ -116,7 +112,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         }
 
         /// <summary>
-        /// Removes the authorization code for a given subject and client.
+        /// Removes the token for a given subject and client.
         /// </summary>
         /// <param name="subject">The subject to filter by.</param>
         /// <param name="client">The client to filter by.</param>
@@ -132,14 +128,14 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _retryHelper.Try(() =>_table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
+                var result = await _retryHelper.Try(() => _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
             var entityDeletionTasks = list.Select(entity =>
             {
                 var op = TableOperation.Delete(entity);
-                return _retryHelper.Try(() =>_table.Value.ExecuteAsync(op)).UntilNoException();
+                return _retryHelper.Try(() => _table.Value.ExecuteAsync(op)).UntilNoException();
             });
 
             await Task.WhenAll(entityDeletionTasks);

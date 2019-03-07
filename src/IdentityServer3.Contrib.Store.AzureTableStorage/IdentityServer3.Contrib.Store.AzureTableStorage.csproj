@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Azure Table Storage Stores for Identity Server 3</Description>
     <VersionPrefix>0.0.8</VersionPrefix>
-    <Authors>Kyle Sonaty</Authors>
+    <Authors>Kyle Sonaty, Tomasz Jaciubek</Authors>
     <TargetFrameworks>net45</TargetFrameworks>
     <AssemblyName>IdentityServer3.Contrib.Store.AzureTableStorage</AssemblyName>
     <PackageId>IdentityServer3.Contrib.Store.AzureTableStorage</PackageId>
@@ -16,11 +16,14 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.9</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WindowsAzure.Storage" Version="7.2.1" />
-    <PackageReference Include="IdentityServer3" Version="2.0.1" />
+    <PackageReference Include="RetryHelper" Version="2.1.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+    <PackageReference Include="IdentityServer3" Version="2.6.3" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
