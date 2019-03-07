@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer3.Core.Models;
 using IdentityServer3.Core.Services;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Retry;
 
 namespace IdentityServer3.Contrib.Store.AzureTableStorage
 {
@@ -15,6 +17,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
     public class AzureTableStorageAuthorizationCodeStore : BaseTokenStore<AuthorizationCode>, IAuthorizationCodeStore
     {
         private readonly Lazy<CloudTable> _table;
+        private readonly RetryHelper _retryHelper;
 
         /// <summary>
         /// Creates a new instance of the Azure Table Storage authorization code store
@@ -34,6 +37,13 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 table.CreateIfNotExists();
                 return table;
             });
+
+            _retryHelper = new RetryHelper(new TraceSource("AzureTableStorageAuthorizationCodeStore"))
+            {
+                DefaultMaxTryCount = 3,
+                DefaultMaxTryTime = TimeSpan.FromSeconds(30),
+                DefaultTryInterval = TimeSpan.FromMilliseconds(200),
+            };
         }
 
         /// <summary>
@@ -52,7 +62,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 SubjectId = value.SubjectId
             };
             var op = TableOperation.InsertOrReplace(entity);
-            await _table.Value.ExecuteAsync(op);
+            await _retryHelper.Try(() => _table.Value.ExecuteAsync(op)).UntilNoException();
         }
 
         /// <summary>
@@ -63,7 +73,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
         public async Task<AuthorizationCode> GetAsync(string key)
         {
             var op = TableOperation.Retrieve<TokenTableEntity>(key.GetParitionKey(), key);
-            var result = await _table.Value.ExecuteAsync(op);
+            var result = await _retryHelper.Try(() => _table.Value.ExecuteAsync(op)).UntilNoException();
             var tokenEntity = result.Result as TokenTableEntity;
             return tokenEntity != null ? FromJson(tokenEntity.Json) : null;
         }
@@ -81,7 +91,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
                 ETag = "*"
             };
             var op = TableOperation.Delete(entity);
-            await _table.Value.ExecuteAsync(op);
+            await _retryHelper.Try(() => _table.Value.ExecuteAsync(op)).UntilNoException();
         }
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _retryHelper.Try(() =>_table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
@@ -122,14 +132,14 @@ namespace IdentityServer3.Contrib.Store.AzureTableStorage
             TableContinuationToken continuationToken = null;
             do
             {
-                var result = await _table.Value.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _retryHelper.Try(() =>_table.Value.ExecuteQuerySegmentedAsync(query, continuationToken)).UntilNoException();
                 continuationToken = result.ContinuationToken;
                 list.AddRange(result.Results);
             } while (continuationToken != null);
             var entityDeletionTasks = list.Select(entity =>
             {
                 var op = TableOperation.Delete(entity);
-                return _table.Value.ExecuteAsync(op);
+                return _retryHelper.Try(() =>_table.Value.ExecuteAsync(op)).UntilNoException();
             });
 
             await Task.WhenAll(entityDeletionTasks);
