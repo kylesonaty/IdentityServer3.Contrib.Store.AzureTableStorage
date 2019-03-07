@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Azure Table Storage Stores for Identity Server 3</Description>
     <VersionPrefix>0.0.8</VersionPrefix>
-    <Authors>Kyle Sonaty</Authors>
+    <Authors>Kyle Sonaty, Tomasz Jaciubek</Authors>
     <TargetFrameworks>net45</TargetFrameworks>
     <AssemblyName>IdentityServer3.Contrib.Store.AzureTableStorage</AssemblyName>
     <PackageId>IdentityServer3.Contrib.Store.AzureTableStorage</PackageId>
@@ -16,6 +16,8 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.9</Version>
   </PropertyGroup>
 
   <ItemGroup>
